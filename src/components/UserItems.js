@@ -6,12 +6,12 @@ import {typography} from '../theme/typography';
 import {Userpic} from 'react-native-userpic';
 
 const UserItems = ({item}) => {
-  const {name, icon, work, visit} = item;
+  const {name, imageURL, work, visit} = item;
   return (
     <View style={styles.itemContainer}>
-      {/* Profile Photo */}
-      {icon ? (
-        <Image style={styles.icon} source={icon} />
+      {/* User image */}
+      {imageURL ? (
+        <Image style={styles.icon} source={{uri: imageURL}} />
       ) : (
         <Userpic
           colorize={true}

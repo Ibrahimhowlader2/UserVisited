@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import FocusStatusBar from '../components/FocusStatusBar';
 import {colors} from '../theme/colors';
 import Text from '../components/text/text';
@@ -17,6 +17,40 @@ import UserItems from '../components/UserItems';
 const HomeScreen = () => {
   const renderItem = ({item}) => {
     return <UserItems item={item} />;
+  };
+
+  const [search, setSearch] = useState('');
+  const [filteredDataSource, setFilteredDataSource] = useState([]);
+  const [masterDataSource, setMasterDataSource] = useState([]);
+
+  useEffect(() => {
+    fetch(
+      'https://raw.githubusercontent.com/Ibrahimhowlader2/jsonfile/master/usersData.json',
+    )
+      .then(response => response.json())
+      .then(responseJson => {
+        setFilteredDataSource(responseJson);
+        setMasterDataSource(responseJson);
+        console.log(responseJson);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }, []);
+
+  const searchFilterFunction = text => {
+    if (text) {
+      const newData = masterDataSource.filter(function (item) {
+        const itemData = item.name ? item.name.toUpperCase() : ''.toUpperCase();
+        const textData = text.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+      });
+      setFilteredDataSource(newData);
+      setSearch(text);
+    } else {
+      setFilteredDataSource(masterDataSource);
+      setSearch(text);
+    }
   };
 
   return (
@@ -42,14 +76,15 @@ const HomeScreen = () => {
           <TextInput
             placeholder="Search employee"
             style={styles.textInputSearch}
+            onChangeText={text => searchFilterFunction(text)}
           />
         </View>
       </View>
       {/* User List*/}
       <View style={{flex: 1, paddingHorizontal: 20}}>
         <FlatList
-          keyExtractor={(item, index) => item.id}
-          data={usersData}
+          keyExtractor={(item, index) => index.toString()}
+          data={filteredDataSource}
           renderItem={renderItem}
         />
       </View>
